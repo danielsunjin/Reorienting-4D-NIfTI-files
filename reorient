@@ -1,0 +1,54 @@
+#!/bin/bash
+
+start=$SECONDS
+
+# Variables to edit
+input=/Users/daniel/Documents/input4D.nii.gz
+time_spacing=1
+time_origin=0
+output=/Users/daniel/Documents/output4D.nii.gz
+new_orientation=RAS
+
+disassembly_outputs=/Users/daniel/Documents/disassembly_outputs
+reorient_outputs=/Users/daniel/Documents/reorient_outputs
+
+# Create directory to store component volumes of the 4D NIfTI
+if [ -d ${disassembly_outputs} ]; then
+	rm -r ${disassembly_outputs}
+fi
+
+mkdir ${disassembly_outputs}
+
+# Disassemble the input 4D NIfTI using ANTs ImageMath
+echo "Disassembling 4D NIfTI"
+ImageMath 4 ${disassembly_outputs}/split.nii.gz TimeSeriesDisassemble ${input}
+
+# Create directory to store the reoriented component volumes of the 4D NIfTI
+if [ -d ${reorient_outputs} ]; then
+	rm -r ${reorient_outputs}
+fi
+
+mkdir ${reorient_outputs}
+
+# Reorient each component volume to the desired orientation using Convert3D
+counter=0
+
+echo "Reorienting component fMRI volumes"
+for file in ${disassembly_outputs}/*
+do
+	printf -v i "%04d" $counter
+	c3d ${file} -orient ${new_orientation} -o ${reorient_outputs}/reorient_${i}.nii.gz
+ 	let counter++
+done
+
+# Reassemble the reoriented component volumes into the desired output 4D NIfTI using ANTs ImageMath
+echo "Assembling reoriented 4D NIfTI"
+ImageMath 4 ${output} TimeSeriesAssemble ${time_spacing} ${time_origin} ${reorient_outputs}/*
+
+# Clean up intermediate directories
+rm -r ${disassembly_outputs}
+rm -r ${reorient_outputs}
+
+# Print the duration of the script
+duration=$(( SECONDS - start ))
+echo "Duration: ${duration} seconds"
