@@ -1,6 +1,6 @@
 # Reorienting 4D NIfTI files
 
-This repository contains a bash script for swapping and flipping the axes of a 4D NIfTI file, such as an fMRI timeseries. 
+This repository contains a bash script for swapping and flipping the axes of a 4D NIfTI file (such as an fMRI timeseries). 
 
 ## Dependencies
 
@@ -22,4 +22,4 @@ Things to edit in the script to make it suite your needs:
 
 ## How the script works
 
-The script disassembles the input 4D NIfTI into its component 3D NIfTIs using ANTs ImageMath. The script then loops through these component 3D NIfTIs and reorients each 3D NIfTI to the desired orientation using Convert3D. The component 3D NIfTIs are finaly reassembled into the output 4D NIfTI using ANTs ImageMath.
+The script disassembles the input 4D NIfTI into its component 3D NIfTIs using ANTs ImageMath. The script then loops through these 3D NIfTIs and reorients each 3D NIfTI to the desired orientation using Convert3D. The reoriented 3D NIfTIs are finaly reassembled into the output 4D NIfTI using ANTs ImageMath.
